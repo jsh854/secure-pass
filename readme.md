@@ -36,11 +36,9 @@ A modern, educational password generation tool built on cryptographic research a
 
 ---
 
-## 🖼️ Screenshots
+## 🖼️ Sections
 
 ### Home Page - Password Generator
-*Screenshot placeholder: Shows the main password generator interface with customizable options and real-time entropy display*
-
 The home page features:
 - Password length slider
 - Character type toggles (uppercase, lowercase, numbers, symbols)
@@ -50,8 +48,6 @@ The home page features:
 - Visual strength indicator
 
 ### Salt Management Section
-*Screenshot placeholder: Shows the salt input/generation interface*
-
 Users can:
 - Manually enter custom salts
 - Auto-generate random salts
@@ -59,8 +55,6 @@ Users can:
 - Copy generated salts
 
 ### Learn Page - Security Research
-*Screenshot placeholder: Shows the comprehensive learning section*
-
 Covers:
 - Key findings from password security research
 - NIST recommendations at a glance
