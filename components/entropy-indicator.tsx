@@ -1,53 +1,64 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Card } from './ui/card';
 import { Zap } from 'lucide-react';
+import { getEntropyColor, getEntropyPercentage, ENTROPY_THRESHOLDS } from '@/lib/password-utils';
 
 interface EntropyIndicatorProps {
   entropy: number;
   label: string;
 }
 
-export default function EntropyIndicator({ entropy, label }: EntropyIndicatorProps) {
-  const getColor = () => {
-    if (entropy < 30) return 'from-red-500 to-red-600';
-    if (entropy < 50) return 'from-yellow-500 to-yellow-600';
-    if (entropy < 70) return 'from-blue-500 to-blue-600';
-    return 'from-accent to-green-600';
-  };
+const STRENGTH_REFERENCE = [
+  { label: 'Weak', range: `< ${ENTROPY_THRESHOLDS.WEAK}b` },
+  { label: 'Moderate', range: `${ENTROPY_THRESHOLDS.WEAK}-${ENTROPY_THRESHOLDS.MODERATE}b` },
+  { label: 'Strong', range: `${ENTROPY_THRESHOLDS.MODERATE}-${ENTROPY_THRESHOLDS.STRONG}b` },
+  { label: 'Very Strong', range: `> ${ENTROPY_THRESHOLDS.STRONG}b` },
+] as const;
 
-  const getPercentage = () => {
-    return Math.min((entropy / 100) * 100, 100);
-  };
+export default function EntropyIndicator({ entropy, label }: EntropyIndicatorProps) {
+  const colorClass = useMemo(() => getEntropyColor(entropy), [entropy]);
+  const percentage = useMemo(() => getEntropyPercentage(entropy), [entropy]);
 
   return (
     <Card className="p-4 bg-card border border-border">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-accent" />
+            <Zap className="w-4 h-4 text-accent" aria-hidden="true" />
             <span className="text-sm font-medium">Password Strength</span>
           </div>
           <div className="text-right">
             <p className="text-sm font-semibold text-accent">{label}</p>
-            <p className="text-xs text-muted-foreground">{entropy.toFixed(1)} bits</p>
+            <p className="text-xs text-muted-foreground" aria-label={`Entropy: ${entropy.toFixed(1)} bits`}>
+              {entropy.toFixed(1)} bits
+            </p>
           </div>
         </div>
-        
-        {/* Entropy Bar */}
+
+        {/* Entropy Progress Bar */}
         <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
           <div
-            className={`h-full bg-gradient-to-r ${getColor()} transition-all duration-300`}
-            style={{ width: `${getPercentage()}%` }}
+            className={`h-full bg-gradient-to-r ${colorClass} transition-all duration-300`}
+            style={{ width: `${percentage}%` }}
+            role="progressbar"
+            aria-valuenow={Math.round(entropy)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Entropy strength indicator"
           />
         </div>
 
-        {/* Strength Reference */}
+        {/* Strength Reference Guide */}
         <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground">
-          <div>Weak<br/>&lt;30b</div>
-          <div>Moderate<br/>30-50b</div>
-          <div>Strong<br/>50-70b</div>
-          <div>Very Strong<br/>&gt;70b</div>
+          {STRENGTH_REFERENCE.map((item) => (
+            <div key={item.label}>
+              {item.label}
+              <br />
+              {item.range}
+            </div>
+          ))}
         </div>
       </div>
     </Card>
